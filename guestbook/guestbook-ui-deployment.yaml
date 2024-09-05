@@ -4,11 +4,32 @@ kind: WorkflowTemplate
 metadata:
   name: busybox-wf
 spec:
+  entrypoint: print-message     # Fields other than "arguments" and "templates" not supported in v2.4 - v2.6
+  arguments:
+    parameters:
+      - name: message
+        value: hello world
   templates:
-    - name: say-hello
+    - name: print-message
+      inputs:
+        parameters:
+          - name: message
       container:
         image: busybox
-        command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 3600']
+        command: [echo]
+        args: ["{{inputs.parameters.message}}"]
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: busybox-wf-invocation
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  workflowTemplateRef:
+    name: busybox-wf
 
 ---
 apiVersion: apps/v1
