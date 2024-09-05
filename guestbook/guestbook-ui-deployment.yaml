@@ -1,4 +1,36 @@
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: busybox-wf-invocation
+  namespace: main
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  replicas: 1
+  entrypoint: say-hello
+  workflowTemplateRef:
+    name: busybox-wf
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: busybox-wf
+  namespace: main
+spec:
+  templates:
+    - name: say-hello
+      inputs:
+        parameters:
+          - name: shard_name
+          - name: bucket_name
+      container:
+        name: busybox
+        command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 30']
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
