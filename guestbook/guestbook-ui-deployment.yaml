@@ -1,17 +1,5 @@
 ---
 apiVersion: argoproj.io/v1alpha1
-kind: Workflow
-metadata:
-  name: busybox-wf-invocation
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-spec:
-  workflowTemplateRef:
-    name: busybox-wf
-
----
-apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
   name: busybox-wf
@@ -25,6 +13,17 @@ spec:
       container:
         image: busybox
         command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 3600']
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: busybox-wf-invocation
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  workflowTemplateRef:
+    name: busybox-wf
 
 ---
 apiVersion: apps/v1
